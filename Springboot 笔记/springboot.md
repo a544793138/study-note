@@ -625,12 +625,12 @@ spring:
 
 ### 7.8.1 原理
 
-1. springboot启动的时候加载煮配置类，开启了自动配置功能 @EnableAutoConfiguration
+1. springboot启动的时候加载主配置类，开启了自动配置功能 @EnableAutoConfiguration
 2. @EnableAutoConfiguration 作用：
 
 - 利用 AutoConfigurationImportSelector 给容器导入一些组件
 
-- 可以查看selectImports() 方法的内容
+- 可以查看 selectImports() 方法的内容
 
   List<String> configurations = getCandidateConfigurations(annotationMetadata,
   ​				attributes); //获取候选的配置
@@ -2379,12 +2379,12 @@ public FilterRegistrationBean webStatFilter() {
    并使用这些注解：
    
    - @Configuration
-- @ConditionalOnXXX
+   - @ConditionalOnXXX
    - @AutoConfigureAfter - 指定顺序，在其他指定的自动配置类之后应用自动配置
    - @Bean - 添加组件
    - @ConfigurationPropertie - 结合相关的 xxxProperties 类来绑定配置
    - @EnableConfigurationProperties - 让 xxxProperties 生效，并加入到容器中
-   
+
 3. **模式 - 研究 spring boot 可发现，starter 都是空的，只是用来引入依赖的，而再编写一个 `xxx-starter-autoconfigurer` 来实现自动配置。**
 
    ![](.\图片\启动器.png)
