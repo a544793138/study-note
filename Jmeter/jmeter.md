@@ -66,3 +66,14 @@ export PATH=$JMETER_HOME/bin:$PATH:$HOME/bin
 
 4. 切换到自己的用户下，就可以直接使用 jmeter 命令了
 
+## 将测试报告转存为 html 格式
+
+测试报文格式 jtl，可以使用以下命令将报告转为 html 格式，最后出来是一个文件夹
+
+```shell
+jmeter -g [测试报告.jtl] -o [生成的文件夹名字]
+
+# 测试后直接将结果转换为 html 格式
+jmeter - n -t .jmx -l .csv -e -o xxx
+```
+
