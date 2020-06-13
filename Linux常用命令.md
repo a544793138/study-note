@@ -3,12 +3,10 @@
 ## 基础
 
 - 关闭防火墙 重启失效：service firewalld stop
-
 - 查看 Java 进程：ps -ef | grep java
-
 - 切换至 root 用户：sudo -i
-
 - 当前目录下的文件占用磁盘情况：du -sh *
+- 添加用户：useradd [用户名]，必须添加密码：passwd [用户名]，然后回车，输入密码
 
 ## 压缩 / 解压
 

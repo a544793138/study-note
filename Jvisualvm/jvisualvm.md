@@ -6,7 +6,17 @@ jvisualvm 是 oracle-jdk 中一个有图形界面的监控程序工具，可以�
 
 jvisualvm 提供远程连接功能，方便 java 程序运行在没有图形界面的服务器上，而 jvisualvm 则启动在有图形界面的机器上，方便观察。
 
-要使用远程连接功能，需要以下步骤：
+要使用远程连接功能，有两种办法，第一种相对很简单，第二种不一定可以。需要以下步骤：
+
+- 第一种方法
+
+  在 JVM 参数中添加以下命令，即可：
+
+  ```sh
+  -Dcom.sun.management.jmxremote.port=12345 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false
+  ```
+
+- 第二种方法
 
 1. 在准备启用 jvisualvm 的机器和被监控的服务器上，都需要有 oracle-jdk （仅使用其中的部分指令，不需要配置到环境变量中）
 

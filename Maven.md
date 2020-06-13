@@ -32,4 +32,10 @@
 
   mvn clean package -pl [A] -am  -DskipTests
 
+- 扫描项目的依赖包，显示依赖的情况：是否有冲突、是否重复等等，同时，也可以使用 IDEA 里的 Maven 工具，可以显示出依赖树，显示红色的表示存在冲突
 
+  mvn -U dependency:tree -Dverbose
+
+- 将本地 jar 包安装到本地仓库中
+
+  mvn install:install-file -Dfile=C:\Users\20190418\Desktop\soft-crypto-0.0.1.jar -DgroupId=com.keyou -DartifactId=soft-crypto -Dversion=0.0.1 -Dpackaging=jar

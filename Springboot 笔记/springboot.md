@@ -2363,7 +2363,7 @@ public FilterRegistrationBean webStatFilter() {
 >  注意：SpringApplicationRunListener 需要有参构造器，否则报错
 
 - 只需要添加 @Component 即可
-  - ApplicationRUnner
+  - ApplicationRunner
   - CommandLineRunner
 
 # 20 自定义 starters
