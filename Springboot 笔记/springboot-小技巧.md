@@ -39,5 +39,11 @@ a.thenCombineAsync(b, (a的实际类参数，b的实际类参数) -> {
 
 所以应该使用 `thenComposeAsync` 的方法，这样就不会嵌套了。
 
+## Spring boot 自动建数据库表
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
+```
+
 
 
