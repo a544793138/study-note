@@ -51,3 +51,11 @@
 - 查看连接状况：
 
   netstat -nat | grep -iw "9090"
+
+5. 查看文件大小
+
+    du -sh *
+
+6. which java
+
+ls -al xxxx
