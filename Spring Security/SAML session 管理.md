@@ -2,11 +2,11 @@
 
 ## 现有情况
 
-目前 caas-web 与 Spring Security SAML 整合后，还有 session 在集群中共享（即缓存）的问题。
+目前 应用-web 与 Spring Security SAML 整合后，还有 session 在集群中共享（即缓存）的问题。
 
 在未加入 session 缓存的时候，系统正常，但因为集群的原因必须加入 session 缓存管理（避免多服务器时需要重复登录问题）。
 
-加入 session 缓存（Spring 提供）后，系统出现问题，问题情况表现在系统不断的创建新的 session，特别是当 caas-web 跳转到 IDP 登录时创建的新 session，导致了 SAML 流程中发送认证请求的 session 与接收到断言的 session 不一致，断言验证失败，从而出现了不断在 `/saml/login` 到 `IDP 登录地址` 的不断循环。
+加入 session 缓存（Spring 提供）后，系统出现问题，问题情况表现在系统不断的创建新的 session，特别是当 应用-web 跳转到 IDP 登录时创建的新 session，导致了 SAML 流程中发送认证请求的 session 与接收到断言的 session 不一致，断言验证失败，从而出现了不断在 `/saml/login` 到 `IDP 登录地址` 的不断循环。
 
 ## 尝试 1 - 替换 SAMLMessageStorageFactory - 失败
 
@@ -48,12 +48,12 @@ public WebSessionStorage(HttpServletRequest request) {
 ...
 ```
 
-**同时，加入了之前 caas 的 session 缓存管理。**
+**同时，加入了之前 应用 的 session 缓存管理。**
 
-> 之前 caas 的 session 缓存管理的大概原理：
+> 之前 应用 的 session 缓存管理的大概原理：
 >
 > 1. Spring 提供了注解 `@EnableSpringHttpSession`，加入该注解后，开启 Spring 提供的关于 session 管理，可自定义
-> 2. 加入注解后，Spring 要求一个 SessionRepository 实现类，这个类中主要是定义 session 的创建、查询、保存、删除方法。之前 caas 就是在这里手动在各方法完成对应的缓存操作。
+> 2. 加入注解后，Spring 要求一个 SessionRepository 实现类，这个类中主要是定义 session 的创建、查询、保存、删除方法。之前 应用 就是在这里手动在各方法完成对应的缓存操作。
 > 3. 加入自己自定义的 session 类，当然，是需要实现指定 Session 接口的。
 >
 > 在加入以上内容后，session 的创建、查询、保存、删除，就替换成自定义的方法，session 的实际类型也变为了自己定义的 session 类。
@@ -93,9 +93,9 @@ public WebSessionStorage(HttpServletRequest request) {
 
 4. 继承 `AbstractHttpSessionApplicationInitializer`，只需要继承即可，用于让 Spring Session 的 Filter 先运行于 Spring Security 的 Filter。
 
-### Spring Session Hazelcast 与原有 caas session 管理
+### Spring Session Hazelcast 与原有 应用 session 管理
 
-Spring Session Hazelcast 实与之前 caas 管理 session 的方法差不多：
+Spring Session Hazelcast 实与之前 应用 管理 session 的方法差不多：
 
 1. 缓存部分交由了 Hazelcast 进行管理，用户则只需要按照配置将缓存 session 的缓存空间设置好即可。
 
@@ -115,8 +115,8 @@ Spring Session Hazelcast 实与之前 caas 管理 session 的方法差不多：
 graph TB
 A(用户) --- B(远程桌面 / 本机主机 的浏览器)
 B(远程桌面 / 本机主机 的浏览器) --- C(nginx - 192.1.8.110)
-C(nginx - 192.1.8.110) --- D(caas-web-A 192.1.8.100:8080)
-C(nginx - 192.1.8.110) --- E(caas-web-B 192.1.8.102:8080)
+C(nginx - 192.1.8.110) --- D(应用-web-A 192.1.8.100:8080)
+C(nginx - 192.1.8.110) --- E(应用-web-B 192.1.8.102:8080)
 ```
 
 有如下 nginx 配置：
@@ -179,10 +179,10 @@ http {
 只有 100 服务器
 
 ```properties
-# 打开 caas 登录页
+# 打开 应用 登录页
 100 服务器没有新建 session
 
-# 点击 caas 的登录
+# 点击 应用 的登录
 {100}
 1. 新建 session1
 2. session 加入缓存
@@ -200,10 +200,10 @@ http {
 ## 集群下 SAML 流程
 
 ```properties
-# 打开 caas 登录页
+# 打开 应用 登录页
 100、102 服务器都没有新建 session
 
-# 点击 caas 的登录
+# 点击 应用 的登录
 {102}
 1. 新建 session1
 2. session 加入缓存
@@ -240,7 +240,7 @@ http {
 
 集群情况下，不管是否将请求和响应都负载到同一服务器上，同样会出现找不到 session，从而新建 session 的情况。
 
-发现**集群负载到同一服务器**和**单台实例**的情况下，点击 caas 登录页并跳转到 IDP 登录页时，都会创建一个 session，同时记录到 Cookie 中，名为 SESSION。Cookie 在项目的域上。
+发现**集群负载到同一服务器**和**单台实例**的情况下，点击 应用 登录页并跳转到 IDP 登录页时，都会创建一个 session，同时记录到 Cookie 中，名为 SESSION。Cookie 在项目的域上。
 
 但当到达 IDP 登录页时，因为 IDP 在其他域上，**无法观察此时 系统域上的 Cookie 情况**，但此时浏览器中，无论**集群负载到同一服务器**和**单台实例**都无法发现有 SESSION 数据。
 
@@ -251,13 +251,13 @@ http {
 
 ### 解决
 
-当使用 192.1.8.110 地址打开 caas 登录页时，点击 caas 登录页面后创建的 session1，记录在 Cookie 中，其中的 Domain 为 192.1.8.110。
+当使用 192.1.8.110 地址打开 应用 登录页时，点击 应用 登录页面后创建的 session1，记录在 Cookie 中，其中的 Domain 为 192.1.8.110。
 
 在点击 IDP 登录并，成功登录后，查看 session，虽然是新建的 session2 ，但是发现记录 session 的 Cookie Domain 为 nginxdemo。
 
 发现两个 Cookie 的 Domain 不一致。
 
-所以尝试使用 nginxdemo 域名打开 caas 登录页，发现 session1 的 Domain 同样为 nginxdemo。而这次，当在 IDP 点击登录后，不会再新建 session2，而是使用 session1。
+所以尝试使用 nginxdemo 域名打开 应用 登录页，发现 session1 的 Domain 同样为 nginxdemo。而这次，当在 IDP 点击登录后，不会再新建 session2，而是使用 session1。
 
 问题解决。
 
