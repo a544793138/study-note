@@ -45,5 +45,8 @@ a.thenCombineAsync(b, (a的实际类参数，b的实际类参数) -> {
 spring.jpa.hibernate.ddl-auto=update
 ```
 
+## 修改 Spring boot 插件版本号的问题
 
+在项目拥有多个子项目的情况下，无论 maven / gradle，有时候无法在子项目中指定需要使用的插件版本号，导致 Spring boot 默认的插件版本号会与你指定的版本号一同出现，而 IDE 却无法识别，甚至选择 Spring boot 的默认支持的插件版本作为依赖，让你指定的版本号失效。
 
+这个时候，可以到项目根目录的 pom.xml / build.gradle 中进行指定你需要的插件版本号，或者直接在其中进行依赖的声明，这样肯定就会生效。
