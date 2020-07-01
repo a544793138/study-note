@@ -267,4 +267,24 @@ http {
 
 将 IDP 的 SLO 调整为 `http://nginxdemo:80/saml/SingleLogout` 即可。
 
+### Cookie 的 SameSite 
+
+Spring session 对 session 的管理，会依赖到 cookie。它会把 sessionId 记录到 cookie 中。
+而 Spring session 在 request 中无法通过 attribute 获取到已经创建了的 session 时，
+则会尝试从 cookie 中找到 sessionId，并通过这个 sessionId 在缓存中找到对应的 session。
+
+但是如果 cookie 的 SameSite 为 Lax，则表示 cookie 将不会附带于在任何 POST 类型的请求。
+而 SAML 2.0 中，从 IDP 登录后跳转回 SP 的过程则是通过 POST 请求完成的。
+所以，无法带有 cookie 的 POST 请求，将会导致 Spring session 无法找到已经缓存的 session，从而新建 session，导致 SAML 验证失败。
+
+避免以上情况也很简单，可以使用 spring 提供的 CookieSerializer 来修改默认的 SameSite。
+```java
+@Bean
+public CookieSerializer cookieSerializer() {
+    DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+    // SameSite.None 不同于 null
+    serializer.setSameSite(CookieHeaderNames.SameSite.None.name());
+    return serializer;
+}
+```
 
