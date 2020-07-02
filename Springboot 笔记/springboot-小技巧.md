@@ -50,3 +50,13 @@ spring.jpa.hibernate.ddl-auto=update
 在项目拥有多个子项目的情况下，无论 maven / gradle，有时候无法在子项目中指定需要使用的插件版本号，导致 Spring boot 默认的插件版本号会与你指定的版本号一同出现，而 IDE 却无法识别，甚至选择 Spring boot 的默认支持的插件版本作为依赖，让你指定的版本号失效。
 
 这个时候，可以到项目根目录的 pom.xml / build.gradle 中进行指定你需要的插件版本号，或者直接在其中进行依赖的声明，这样肯定就会生效。
+
+## Spring boot 开放 @Bean 中需要使用的配置项
+
+Spring boot 开放配置项很简单，使用 @Value 或者 @ConfigurationProperties 即可。
+
+但是，如果开放的配置项是用于 @Bean 中的，由于 @Bean 在 Spring boot 启动时加入 Spring IOC 的容器优先级比较高，
+所以上述两种方法还不够，会出现 Spring boot 配置文件中配置了参数，但无法在代码中获取到的情况。
+
+这个时候，可以用一个类包装需要开放的参数，依然使用  @ConfigurationProperties 注解来标注包装类。
+但在需要使用参数的 @Bean 中的类上，使用 `@EnableConfigurationProperties(包装类.class)` 即可。
