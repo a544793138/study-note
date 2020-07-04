@@ -2,45 +2,29 @@
 
 原有应用路径及跳转：
 
-- `http://localhost:8080/#/login` 为原有登录页
-- `http://localhost:8080/#/index` 为原有首页，即登录后的页面
-
-```
-http://localhost:8080 => http://localhost:8080/#/login
-http://localhost:8080/ => http://localhost:8080/#/login
-http://localhost:8080/index => 404
-http://localhost:8080/index.html => http://localhost:8080/index.html#/login
-http://localhost:8080/login => 404
-http://localhost:8080/login.html => 404
-http://localhost:8080/# => http://localhost:8080/#/login
-http://localhost:8080/#/login => http://localhost:8080/#/login
-http://localhost:8080/#/login.html => http://localhost:8080/#/login
-http://localhost:8080/#/index => http://localhost:8080/#/login
-http://localhost:8080/#/index.html => http://localhost:8080/#/login
-```
+- `http://localhost:8080/login` 为原有登录页
+- `http://localhost:8080/index` 为原有首页，即登录后的页面
 
 现有的应用路径及跳转：
 
 **登录流程**
 
-1. 在 `http://localhost:8080/#/login` 打开登录页（不受 SP 保护，只有一个登录按钮）。
+1. 在 `http://localhost:8080/login` 打开登录页（不受 SP 保护，只有一个登录按钮）。
 
 2. 点击登录按钮，跳转到 `http://localhost:8080/saml/login`，应用发送认证请求，会跳转到 IDP 进行登录。
 
 3. IDP 输入用户、密码后，点击登录后，跳转到应用的`http://localhost:8080/saml/SSO`，在 应用中消费断言。
 
-4. 断言验证通过后，应用 触发 `/login` 接口，在接口中为响应添加一个 Cooike 用于帮助前端知道已经登录，然后重定向到应用首页。
+4. 断言验证通过后，应用触发你在 `SavedRequestAwareAuthenticationSuccessHandler ` Bean 中定义的跳转地址
+，这可以是一个 restful 接口，在接口中可以获得 request，response，还有登录了的用户信息，可以利用这些对象进行一些逻辑处理；
+也可以直接在 Bean 中重定向到你需要的页面。
 
-5. 进入首页后，前端通过 `GET /web/user` 获取通过 SAML 登录的用户信息。
-
-   同时，后台也可以从中获取到同样的用户信息，并将其保存，用于角色权限校验。
-
+- 用户信息
 ```json
-用户信息：
 {
+// userId - 用户登录 IDP 时输入的帐号名（邮箱，用户名），不需要扩展返回数据即可获取    
     "userId":...
 }
-userId - 用户登录 IDP 时输入的帐号名（邮箱，用户名），不需要扩展返回数据即可获取
 ```
 
 > 修复 BUG
@@ -49,7 +33,22 @@ userId - 用户登录 IDP 时输入的帐号名（邮箱，用户名），不需
 >
 > 原因：重启实例后，session 不一致，或者说当前页面的 session 已经无效。应用和 IDP 无法通过这个 session 建立联系，所以可以看到后台只有 应用 的认证请求日志，没有看到 IDP 的断言响应。
 >
-> 解决：在 Spring Security 中配置关于 seesion 无效后的跳转地址，设置为 `/#/`，重新跳转到 应用 的登录页。
+> 解决：在 Spring Security 中配置关于 seesion 无效后的跳转地址(可以为地址，可以为 restful 接口)，处理无效的 session 即可。
+>
+> ```java
+> @Configuration
+> @EnableWebSecurity
+> @EnableGlobalMethodSecurity(securedEnabled = true)
+> public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+> 
+>     @Override
+>     protected void configure(HttpSecurity http) throws Exception {
+>         http
+>         .sessionManagement()
+>         .invalidSessionUrl("/invalid/session")
+>     }
+> }
+> ```
 
 **登出流程**
 

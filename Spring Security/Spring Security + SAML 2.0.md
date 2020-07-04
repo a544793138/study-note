@@ -59,7 +59,7 @@ Spring 公司对 Spring Security 和 SAML 2.0 两种技术，目前 Spring 公�
   - 这是一个名为 Spring Security SAML 的独立扩展库，这个库完整的实现了 SAML 2.0
   - 因为支持完善的原因，配置相对复杂。
 - Spring Security 的 SAML 2.0 Login 功能
-  - 这是 Spring Security 框架的一个技术支持 / 功能，目前未完善，有一个相对重要的功能：` Single logout ` 未实现。
+  - 这是 Spring Security 框架的一个技术支持 / 功能，**目前未完善，有一个相对重要的功能：` Single logout ` 未实现**。
   - 配置相对简单。
 
 对于以上的两种实现，都已经找到了相应的 demo。
@@ -84,9 +84,7 @@ Spring 公司对 Spring Security 和 SAML 2.0 两种技术，目前 Spring 公�
 - **断言消费者（ACS）/ 单点登录网址 / 收件人 URL / 目标地址** ： 这是一个地址，用于表示 IDP 产生断言后，将断言发送回 SP，SP 负责处理断言的地址。如 demo 中的：`http://localhost:8080/saml/SSO`
 -  **受众群体 / 观众** ：一个字符串，是 SP 的标识。demo：`urn:test:linxl:guangzhou:keyou`
 - **默认 Relay State**：一个地址，表示 IDP 登录成功后，返回 / 跳转到 SP 的哪个地址上。demo：`http://localhost:8080/home`
-- [其余的请参考 Okta 中 `SAML IDP` 应用的具体配置（IDP 的设置地址）](<https://dev-812782-admin.okta.com/admin/app/keyoudev812782_samlidp_1/instance/0oad69wmvVC6AlTTY4x6/#tab-general>)
-  - 用户：linxl@keyou.cn
-  - 密码：12345678aA
+- [其余的请参考相关的说明文档](https://github.com/a544793138/springboot-security-saml-demo)
 
 
 

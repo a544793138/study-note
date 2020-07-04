@@ -2,11 +2,15 @@
 
 ## 现有情况
 
+> 这是直接使用 spring-session-core，自己实现 session 的 repository，以及缓存 session 的时候
+
 目前 应用-web 与 Spring Security SAML 整合后，还有 session 在集群中共享（即缓存）的问题。
 
 在未加入 session 缓存的时候，系统正常，但因为集群的原因必须加入 session 缓存管理（避免多服务器时需要重复登录问题）。
 
-加入 session 缓存（Spring 提供）后，系统出现问题，问题情况表现在系统不断的创建新的 session，特别是当 应用-web 跳转到 IDP 登录时创建的新 session，导致了 SAML 流程中发送认证请求的 session 与接收到断言的 session 不一致，断言验证失败，从而出现了不断在 `/saml/login` 到 `IDP 登录地址` 的不断循环。
+加入 session 缓存（Spring 提供）后，系统出现问题，问题情况表现在系统不断的创建新的 session，
+特别是当 应用-web 跳转到 IDP 登录时创建的新 session，导致了 SAML 流程中发送认证请求的 session 与接收到断言的 session 不一致，
+断言验证失败，从而出现了不断在 `/saml/login` 到 `IDP 登录地址` 的不断循环。
 
 ## 尝试 1 - 替换 SAMLMessageStorageFactory - 失败
 
@@ -69,6 +73,7 @@ public WebSessionStorage(HttpServletRequest request) {
 ### Spring Session Hazelcast 配置：
 
 > 以下配置都可以从 Spring Session 官方文档中找到，[官方 Sample](<https://github.com/spring-projects/spring-session/tree/master/spring-session-samples/spring-session-sample-javaconfig-hazelcast>)
+> 这些配置其实是 spring-session-hazelcast 的配置，而 spring-session 好像不需要配置 Hazelcast Map 的部分，两者区别请参考 [这里](#发现 spring-session 与 spring-session-hazelcast 的区别)
 
 1. 添加注解 `@EnableHazelcastHttpSession` 到 Hazelcast 配置类中，可使用注解属性 `maxInactiveIntervalInSeconds` 设置 session 的超时时间，如 `@EnableHazelcastHttpSession(maxInactiveIntervalInSeconds = 900)`，表示超时时间 900 秒。
 
@@ -173,6 +178,19 @@ http {
    ```
    Destination in the LogoutResponse was not the expected value http://nginxdemo/saml/SingleLogout
    ```
+   
+## 发现 spring-session 与 spring-session-hazelcast 的区别
+
+- spring-session 是 Spring Session 团队早期出的版本，将所有功能都包含在其中，最新版本为 1.3.5.RELEASE，更新日期为 2019 年。
+- spring-session-hazelcast 则是 Spring Session 团队因为 spring-session 功能逐渐多样化而进行拆分后的版本，
+将 spring-session 中关于 Hazelcast 实现缓存 session 管理的部分拆分出来，同样的还有其它依赖，spring-session-hazelcast 只是拆分后的其中之一，
+它的最新版本是 2.3.0，更新日期为 2020 年。
+
+所以，spring-session 是一个过去的版本，里面的代码相对较旧，
+而 Spring Session 的后续更新也会以拆分依赖的形式进行发布，所以 spring-session-hazelcast 拥有更新的代码。  
+
+下面的研究过程中，是先研究集成 spring-session 依赖的。因为此时发现 spring-session 可以“带点问题的进行 SSO”
+，但 spring-session-hazelcast 则是完全不行。 
 
 ## 单个实例 SAML 流程
 
@@ -236,7 +254,7 @@ http {
 系统寻找 session 有两种方法：
 
 - 从 request 的 attribute 中直接读出 currentSession
-- 如果没有找到 currentSession，则通过 `cookieSerializer.readCookieValues(request);` 读取 request 中的 cookie，因为 Spring Session Hazelcast 创建的 session 会保存到 cookie
+- 如果没有找到 currentSession，则通过 `cookieSerializer.readCookieValues(request);` 读取 request 中的 cookie，因为 spring-sesion 创建的 session 会保存到 cookie
 
 集群情况下，不管是否将请求和响应都负载到同一服务器上，同样会出现找不到 session，从而新建 session 的情况。
 
@@ -257,7 +275,8 @@ http {
 
 发现两个 Cookie 的 Domain 不一致。
 
-所以尝试使用 nginxdemo 域名打开 应用 登录页，发现 session1 的 Domain 同样为 nginxdemo。而这次，当在 IDP 点击登录后，不会再新建 session2，而是使用 session1。
+所以尝试使用 nginxdemo 域名打开 应用 登录页，发现 session1 的 Domain 同样为 nginxdemo。
+而这次，当在 IDP 点击登录后，不会再新建 session2，而是使用 session1。
 
 问题解决。
 
@@ -266,6 +285,23 @@ http {
 调试发现 SAML 代码中会判断 SLO 的 **登出响应目标地址** 和 **实际登出响应地址** 是否一致。当 IDP 的 SLO 地址配置为 `http://nginxdemo/saml/SingleLogout` 时，与实际的登出响应 `http://nginxdemo:80/saml/SingleLogout` 不一致，所以无法登出。
 
 将 IDP 的 SLO 调整为 `http://nginxdemo:80/saml/SingleLogout` 即可。
+
+### 切换到 spring-session-hazelcast 依赖
+
+通过以上研究，使用 spring-session 依赖管理集群中的 session，把 session 的缓存交给 Hazelcast 完成已经完全成功了。
+但其中从 spring-session-hazelcast 的代码中可以发现，spring-session 中的部分代码在 spring-session-hazelcast 中被过期了。
+所以换上 spring-session-hazelcast 可能是更好的选择。
+
+但是上面也说到，使用 spring-session-hazelcast 时，依然是无法成功进行 SSO、SLO 的，
+同样是因为无法找到已经创建过（已经缓存到 Hazelcast）中的 session。
+
+spring-session-hazelcast 与 spring-session 寻找 session 的方法是一样的：首先通过 request 的 attributes 寻找
+，无法找到则通过 request 的 cookie 寻找。
+
+但重复上面的研究和尝试，还是会出现一个问题：
+明明 session 被创建后已经被缓存到 Hazelcast，sessionId 也被写道 cookie 中，
+但从 IDP 登录成功后跳转回 SP 的请求中，却怎么也没有了之前的 cookie。
+从而导致 Spring Session 找不到 session 而新建 session，新建 session 中无法找到 SAML 相关的内容，SAML 就会验证失败。
 
 ### Cookie 的 SameSite 
 
