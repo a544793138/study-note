@@ -1,5 +1,14 @@
 # Java 反射的应用
 
+## 简单的反射
+
+```java
+// 类完成的包路径
+String classPath = "";
+// 这里可以强转为对应的类
+Class.forName(classPath).newInstance();
+```
+
 ## 利用反射获取类中私有的成员变量
 
 这个方法可能不是能经常使用到，但是却是一个很重要的途径。
