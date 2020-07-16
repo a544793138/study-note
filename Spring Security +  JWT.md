@@ -27,12 +27,23 @@ A(用户认证请求) --> B(AuthenticationToken)
 B --> C(AuthenticationManager)
 C --> D(AuthenticationProvider)
 D --> E(校验是否成功)
-E --> F(成功 SuccessHandler,SecurityContext.setAuthtication)
+E --> F(成功 SuccessHandler SecurityContext.setAuthtication)
 E --> G(失败 FailureHandler)
 ```
 
+## Web Filter
 
+对于 web 项目而言，进入认证的最佳入口就是 Filter 了。而 spring security 也通过 filter 实现了很多默认的认证逻辑，和常见的 web 攻击的防护。
 
+### 常见 filter
 
+下面按 request 进入的顺序列举一下常用的 filter：
 
+- SecurityContextPersistenceFilter - 用于将 SecurityContext 放入 Session 的 filter
+- UsernamePasswordAuthenticationFilter - 登录认证的 filter（默认拦截 POST /login 的登录接口，是通过 form 形式的登录），类似的还有 CasAuthenticationFilter、BasicAuthenticationFilter 等。
+在这些 filter 中生成用于认证的 token，提交到 AuthenticationManager，如果认证失败会直接返回。
 
+- RemeberMeAuthenticationFilter - 通过 cookie 来实现 remember me 功能的 filter
+- AnonymousAuthentication - 如果一个请求在到达这个 filter 前 SecurityContext 没有初始化，则这个 filter 会默认生成一个匿名 SecurityContext。这在支持匿名用户的系统中非常有用。
+- ExceptionTranslationFilter - 捕获所有 Spring Security 抛出的异常，并决定处理方式
+- FilterSecurityinterceptor - 权限校验的拦截器，访问的 url 权限不足时会抛出异常
