@@ -164,6 +164,18 @@ $ git push origin master
 
 # 将远程仓库克隆到本地
 $ git clone git@github.com:<username>/<repository>.git
+
+# 创建新的本地 git 仓库，并推动到刚创建的 github 仓库
+echo "# spring-security-saml-token-demo" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/a544793138/spring-security-saml-token-demo.git
+git push -u origin master
+
+# 推送一个已经存在的本地 git 仓库到刚创建的 github 仓库
+git remote add origin https://github.com/a544793138/spring-security-saml-token-demo.git
+git push -u origin master
 ```
 
 
