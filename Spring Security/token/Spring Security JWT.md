@@ -13,9 +13,21 @@ AuthenticationManager 默认的实现类是 ProviderManager。
   - 提交的用户名密码，通过数据库查询 user 数据作对比的，就是 DaoProvider
   - 通过 CAS 请求单点登录系统实现，就是 CASProvider。
   - 还有很多，Spring Security 做了很多默认的实现。（也包括 SAML）
+  
+- **UserDetailsService** - 在 AuthenticationProvider 中可以使用 UserDetailsService#loadUserByUsername 方法来加载用户。
+```java
+UserDetails user = userService.loadUserByUsername(name);
+```
+
+- **UserDetails** - 在 UserDetailsService#loadUserByUsername 中，需要在最后返回一个 UserDetails 对象，
+可以自己继承 UserDetails 来定义自己的属性，在 AuthenticationProvider 的最后返回 UserDetails 对象的时候，需要强制转回自定义的 UserDetails。
+```java
+return new SamlAuthToken((强制转回自定义的 UserDetails)user, token, user.getAuthorities(), assertion);
+```
 
 - **SecurityContext** - 当用户认证通过之后，就会为用户生成一个唯一的 SecurityContext，里面包含用户的认证信息 Authentication。
-通过 SecurityContext 我们可以获取到用户的标识 Principle （其中包含用户的信息，比如用户名之类的。在 Spring Seucrity 中可以通过注解 @AuthenticationPrincipal 直接获取到）
+通过 SecurityContext 我们可以获取到用户的标识 Principle （其中包含用户的信息，比如用户名之类的。
+在 Spring Seucrity 中可以通过注解 @AuthenticationPrincipal 直接获取到）
 和授权信息 GrantedAuthrity（其中包含用户的角色信息 Role）。
 在系统的任何地方，只要通过 SecurityHolder.getSecurityContext() 就可以获取到 SecurityContext。
 
