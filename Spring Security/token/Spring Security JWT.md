@@ -2,6 +2,9 @@
 
 ## spring security 核心概念
 
+- **Filter** - 因为 AuthenticationManager 需要一个 AuthenticationToken，所以当用户请求进来时，
+过滤器的工作就是将请求头中字符串类型的 token 封装为一个 AuthenticationToken，然后通过 AuthenticationManager#authenticate() 方法来处理 token。
+
 - **AuthenticationManager** - 用户认证的管理类。
 所有的认证请求都会通过提交一个 token (AuthenticationToken) 给 AuthenticationManager#authenticate() 方法来实现。
 但具体的校验 token 不是由它来做，它会将请求转发给具体的实现类。
