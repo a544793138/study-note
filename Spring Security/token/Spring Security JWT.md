@@ -46,6 +46,9 @@ E --> F(成功 SuccessHandler SecurityContext.setAuthtication)
 E --> G(失败 FailureHandler)
 ```
 
+>注意：在 SuccessHandler 中，除了需要完成 `SecurityContext.setAuthtication` 的设置外（不过这个设置不一定在 SuccessHandler 中），
+>最重要是将入参 authtication 的状态 `setAuthtication(true)`，表示已经经过认证了，否则会在 FilterSecurityinterceptor 中因为权限检查重新调用 Provider 的验证机制。
+
 ## Web Filter
 
 对于 web 项目而言，进入认证的最佳入口就是 Filter 了。而 spring security 也通过 filter 实现了很多默认的认证逻辑，和常见的 web 攻击的防护。
