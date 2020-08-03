@@ -114,3 +114,31 @@ void verifyIssuer(Issuer issuer) throws SAMLException {
     }
 }
 ```
+
+## 过长的 HTTP 请求头带来的配置问题
+
+由于 SAML token 是一整个 XML 内容，虽然它可能不是 SAML 响应，而是 SAML 断言，但 SAML 断言的长度也绝对不短。
+
+那么当我们将 SAML token 放到 HTTP 请求头后，就会带来一些问题：服务器 / 代理服务器（如 nginx）在接受 / 发送 HTTP 时，HTTP 头长度的限制。
+
+- Tomcat
+
+对于我们系统的服务器，比如是 Tomcat，默认会对 HTTP 头长度进行限制，不进行配置的话，将无法接收这么长的 HTTP 请求，配置如下：
+
+```properties
+server.max-http-header-size: 40960
+```
+
+- nginx
+
+添加以下配置以修改 nginx 转发 HTTP 时，默认的 HTTP 头长度限制。
+
+```
+# 在 http 字段中，以下为修改 HTTP 头长度限制
+proxy_buffer_size 128k;
+proxy_buffers 4 256k;
+proxy_busy_buffers_size 256k;
+
+# 在 location 字段中，以下为添加请求头转发
+#proxy_set_header HTTP头属性名 $http_HTTP头属性名;
+```
