@@ -103,6 +103,8 @@ $ git branch -D <name>
 $ git remote
 # 更详细的信息
 $ git remote -v
+# 同时推送到多个git远程仓库地址，使用以下命令可以多加一个推送目的地
+git remote set-url --add origin [git远程仓库地址]
 
 # 把该分支上的所有本地提交推送到远程库
 $ git push origin master
