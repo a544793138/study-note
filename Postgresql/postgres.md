@@ -72,3 +72,5 @@ postgresql.conf：
 
 max_connections = 500
 
+**删除指定数据库的连接**
+select pg_terminate_backend(pid) from pg_stat_activity where datname='caastest3';
