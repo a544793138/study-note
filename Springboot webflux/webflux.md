@@ -57,11 +57,11 @@ public class RouteConfig {
     @Bean
     public RouterFunction<ServerResponse> routerFunction(HelloHandler testController) {
         return RouterFunctions
+                // 接受 GET /hello 请求，然后使用 HelloHandler#ping 方法处理该请求
                 .route(RequestPredicates.GET("hello"), testController::ping)
+                // 接受 POST /webflux-mirror-method 请求，然后使用 HelloHandler#webfluxMirrorMethod 方法处理该请求
                 .andRoute(RequestPredicates.POST("/webflux-mirror-method")
-                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), testController::webfluxMirrorMethod)
-                ;
+                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), testController::webfluxMirrorMethod);
     }
-
 }
 ```
