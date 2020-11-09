@@ -74,3 +74,11 @@ max_connections = 500
 
 **删除指定数据库的连接**
 select pg_terminate_backend(pid) from pg_stat_activity where datname='caastest3';
+
+# 列出所有 schema
+\dn
+
+# 创建 schema。
+# schema 是用在多人共享数据库，而又希望数据库相互独立的需求中的。默认是 public。不同的人可以创建不同的 schema，从而拥有相同的数据库名和地址等基本参数，但内容却是相互独立的。
+# 一般在进入具体数据库后，再创建需要的 schema
+create schema [schema 名字]

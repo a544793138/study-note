@@ -305,3 +305,7 @@ hello-world         latest              690ed74de00f        6 months ago        
 training/webapp     latest              6fae60ef3446        11 months ago       348.8 MB
 ```
 
+
+启动 caas 数据库
+systemctl start docker
+sudo docker start postgres
