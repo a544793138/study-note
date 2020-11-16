@@ -37,8 +37,8 @@
     // 这个方法是用来生成不包含 OID 的 RSA 公钥值
     public byte[] getRSAPublicKey(byte[] m, byte[] e) {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new ASN1Integer(m));
-        vector.add(new ASN1Integer(e));
+        vector.add(new ASN1Integer(new BigInteger(1, m)));
+        vector.add(new ASN1Integer(new BigInteger(1, e)));
         DERSequence sequence = new DERSequence(vector);
         try {
             return sequence.getEncoded();
@@ -47,3 +47,5 @@
         }
     }
 ```
+
+其中，`new BigInteger(1, m)` 是为了确保 m 为正整数。
