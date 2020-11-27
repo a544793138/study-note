@@ -10,6 +10,7 @@
         try {
             final ECParameterSpec ecParameterSpec = ECNamedCurveTable.getParameterSpec(curveName);
             // 04 表示未压缩
+            // 也可以写成 byte[] uncompressed = {0x04};
             byte[] uncompressed = Hex.decode("04");
             byte[] uncompressedKeyValue = new byte[publicKey.length + uncompressed.length];
             System.arraycopy(uncompressed, 0, uncompressedKeyValue, 0, uncompressed.length);
