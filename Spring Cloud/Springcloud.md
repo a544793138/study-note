@@ -99,24 +99,73 @@ Cloud 不是一种技术，而是一堆技术的集合，大概 21 种技术
 
 ![](images\微服务技术栈.png)
 
+## 2.4 为什么选择 SpringCloud
 
+**为什么我们更多选择 SpringCloud 作为微服务架构呢？**
 
+首先要知道，不是只有 SpringCloud 才是微服务架构，还有很多其它的，微服务架构是一个理论，就好比买汉堡的就有肯德基，麦当劳，汉堡王，华莱士等等。
 
+原因可以从以侠几个方面：
+
+- 整个解决方案和框架成熟度 - 框架已经成型且成熟了，能适用于多种多样的业务场景
+- 社区热度 - 学习了这个框架的人，形成了主流
+- 可维护性 - 因为多人使用而产生的多种问题，已经有很多相关的问题解决答案
+- 学习曲线，学习成本 - 容易学习的，拥有完整且不断更新的官方文档，或者是与另一种技术一脉相承的。
+
+**当前各大 IT 公司的微服务架构有哪些呢？**
+
+- 阿里 - Dubbo / HSF
+- 京东 - JSF
+- 新浪微博 - Motan
+- 当当网 - DubboX
+
+**当前比较重点的是 Dubbo3.0 和 SpringCloud**
+
+不谈 Dubbo 和 SpringCloud 的对比，看的视频已经挺老了。但 SpringCloud 是一个完整的微服务框架。
 
 # 3 Spring Cloud 入门
 
-## 4 Rest 微服务构建案例工程模块
+## 3.1 简介
 
-## 5 Eureka 服务注册与发现
+SpringCloud 是一堆技术。这是 Spring 官网中对一个简单分布式系统的图例。
 
-## 6 Ribbon 负载均衡
+![](images\SpringCloud结构.png)
 
-## 7 Feign 负载均衡
+SpringCloud 是基于 Springboot，提供的一整套微服务解决方案，包括服务注册与发现，配置中心，全链路监控，服务网关，负载均衡，熔断器等组件，除了基于 NetFlix 的开源组件做高度抽象封装外，还有一些选型中立的开源组件。
 
-## 8 Hystrix 断路器
+## 3.2 SpringCloud 与 SpringBoot 的关系
 
-## 9 zuul 路由网关
+- boot 就是一个个的服务，Cloud 是整个微服务框架，包含一系列的技术
 
-## 10 Spring Cloud Config 分布式配置中心
+- Cloud 将 boot 开发的服务管理，整合起来
 
-## 11 总结
+- boot 就像医院里的一个个科室，而 Cloud 是整个医院
+
+- boot 可以独立，但是 Cloud 依赖 boot。
+
+- Spring boot 专注与快速、方便的开发单个微服务个体，SpringCloud 关注全局的服务治理框架
+
+## 3.3 SpringCloud 与 Dubbo 的区别
+
+> 不确定现在最新 Dubbo 是否仍如此，仅记录视频里说到的
+
+- SpringCloud 没有采用 RPC 通信，而是采用了 HTTP 的 REST，Dubbo 采用了 RPC 通信。REST 比 RPC 更加灵活，不存在代码级别的强依赖。
+- SpringCloud 拥有相对更完整的微服务架构，更种需要使用到的组件都与 Springboot 一脉相承。
+- 社区支持和热度
+
+# 4 Rest 微服务构建案例工程模块
+
+# 5 Eureka 服务注册与发现
+
+# 6 Ribbon 负载均衡
+
+# 7 Feign 负载均衡
+
+# 8 Hystrix 断路器
+
+# 9 zuul 路由网关
+
+# 10 Spring Cloud Config 分布式配置中心
+
+# 11 总结
+
