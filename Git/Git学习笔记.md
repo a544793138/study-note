@@ -137,6 +137,9 @@ $ git push origin --tags
 # 删除远程标签，需要先删除本地标签，然后再使用如下
 $ git push origin :refs/tags/v0.9
 
+# 强制使用远程 tag 覆盖本地 tag
+$ git pull -tf
+
 # 将本地的远程分支列表更新到与远程仓库拥有的分支列表一致，是用来清理本地已经被删除的远程分支的
 git remote prune origin
 ```
