@@ -49,3 +49,9 @@
 ```
 
 其中，`new BigInteger(1, m)` 是为了确保 m 为正整数。
+
+- RSA 中 e 从 String 转为 byte[]
+ `new BigInteger(e).toByteArray()`
+- e 从 byte[] 转为 String
+ `new BigInteger(e).toString()`
+  
